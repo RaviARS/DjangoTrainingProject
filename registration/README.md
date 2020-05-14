@@ -1,6 +1,4 @@
-# DjangoTrainingProject
-
-## Registration 
+## Django Training project
 
 ### To run Django Project
 
