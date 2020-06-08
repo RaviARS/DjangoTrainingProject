@@ -9,6 +9,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
+from rest_framework.authentication import SessionAuthentication, BaseAuthentication
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import permissions
+
 
 def publish_mqtt_msg(topic, mqtt_msg):
     """  To publish the message to Mqtt broker """
@@ -47,7 +51,26 @@ def publish_mqtt_msg(topic, mqtt_msg):
     mqttc.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
 
 
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission to only allow owners of an object to edit it.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Write permissions are only allowed to the owner of the snippet.
+        return obj.owner == request.user
+
+
 class CustomerList(APIView):
+    authentication_classes = [SessionAuthentication, BaseAuthentication]
+    # permission_classes = [IsAuthenticated, IsAdminUser ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
 
     def get(self, request):
         customers = Customer.objects.all()

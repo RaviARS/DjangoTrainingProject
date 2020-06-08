@@ -29,3 +29,6 @@
 - Step 6: To view celery task in GUI type below url to your browser
 
         http://127.0.0.1:5555/tasks/
+
+Note: Git Hub Link
+https://github.com/RaviARS/DjangoTrainingProject
